@@ -66,8 +66,86 @@ if('serviceWorker'in navigator && /^https?:$/.test(location.protocol))navigator.
 const IPA={
 'Bonjour':'/bɔ̃.ʒuʁ/','Salut':'/sa.ly/','Bonsoir':'/bɔ̃.swaʁ/','Au revoir':'/o ʁə.vwaʁ/','Merci':'/mɛʁ.si/','S’il vous plaît':'/sil vu plɛ/','Oui':'/wi/','Non':'/nɔ̃/','Je suis…':'/ʒə sɥi/','Je m’appelle…':'/ʒə ma.pɛl/','Enchanté(e)':'/ɑ̃.ʃɑ̃.te/','Ça va ?':'/sa va/','Très bien.':'/tʁɛ bjɛ̃/','Pas mal.':'/pa mal/','Je vais bien.':'/ʒə vɛ bjɛ̃/','zéro':'/ze.ʁo/','un':'/œ̃/','deux':'/dø/','trois':'/tʁwa/','quatre':'/katʁ/','cinq':'/sɛ̃k/','six':'/sis/','sept':'/sɛt/','huit':'/ɥit/','neuf':'/nœf/','dix':'/dis/','la famille':'/la fa.mij/','la mère':'/la mɛʁ/','le père':'/lə pɛʁ/','les parents':'/le pa.ʁɑ̃/','un enfant':'/œ̃.nɑ̃.fɑ̃/','un frère':'/œ̃ fʁɛʁ/','une sœur':'/yn sœʁ/','de l’eau':'/də lo/','un café':'/œ̃ ka.fe/','un thé':'/œ̃ te/','du pain':'/dy pɛ̃/','du fromage':'/dy fʁɔ.maʒ/','une pomme':'/yn pɔm/','aujourd’hui':'/o.ʒuʁ.dɥi/','demain':'/də.mɛ̃/','hier':'/jɛʁ/','lundi':'/lœ̃.di/','mardi':'/maʁ.di/','mercredi':'/mɛʁ.kʁə.di/','jeudi':'/ʒø.di/','vendredi':'/vɑ̃.dʁə.di/','samedi':'/sam.di/','dimanche':'/di.mɑ̃ʃ/','à gauche':'/a ɡoʃ/','à droite':'/a dʁwat/','tout droit':'/tu dʁwa/','ici':'/i.si/','là-bas':'/la.ba/','parce que':'/paʁs kə/','mais':'/mɛ/','donc':'/dɔ̃k/','Je ne comprends pas.':'/ʒə nə kɔ̃.pʁɑ̃ pa/','je pense que…':'/ʒə pɑ̃s kə/','je préfère…':'/ʒə pʁe.fɛʁ/','j’ai':'/ʒe/','je suis':'/ʒə sɥi/','nous sommes':'/nu sɔm/','nous avons':'/nu.za.vɔ̃/'};
 function ipaFor(v){return IPA[v]||'IPA pending verification; use Google pronunciation';}
-function googleURL(t){return 'https://translate.google.com/?sl=fr&tl=en&text='+encodeURIComponent(t)+'&op=translate'}
-function audioButtons(t){return `<a class="btn ghost" style="display:inline-flex;text-decoration:none;padding:8px 10px" href="${escapeHTML(googleURL(t))}" target="_blank" rel="noopener noreferrer" aria-label="Open Google Translate French pronunciation">↗ Hear on Google Translate</a>`}
+// Google Translate pronunciation
+function googleURL(t) {
+  return 'https://translate.google.com/?sl=fr&tl=en&text='
+    + encodeURIComponent(t)
+    + '&op=translate';
+}
+
+// Pronunciation buttons for lessons and practice missions
+function audioButtons(t) {
+  const encoded = encodeURIComponent(t);
+
+  return `
+    <span class="flex" style="gap:7px;align-items:center;flex-wrap:wrap">
+
+      <a
+        class="btn ghost"
+        href="${escapeHTML(googleURL(t))}"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="display:inline-flex;text-decoration:none;padding:8px 10px"
+      >
+        ↗ Google pronunciation
+      </a>
+
+      <button
+        type="button"
+        class="btn secondary"
+        style="padding:8px 10px"
+        onclick="copyGoogleFrench(decodeURIComponent('${encoded}'))"
+      >
+        Copy phrase
+      </button>
+
+      <a
+        class="btn ghost"
+        href="https://translate.google.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="display:inline-flex;text-decoration:none;padding:8px 10px"
+      >
+        Open Translate
+      </a>
+
+    </span>
+  `;
+}
+
+// Copy the exact French phrase
+async function copyGoogleFrench(t) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(t);
+    } else {
+      const input = document.createElement('textarea');
+      input.value = t;
+      input.style.cssText =
+        'position:fixed;left:-9999px;top:0';
+
+      document.body.appendChild(input);
+      input.select();
+
+      const success = document.execCommand('copy');
+      input.remove();
+
+      if (!success) {
+        throw new Error('Copy unavailable');
+      }
+    }
+
+    notice(
+      'French copied! Open Google Translate, paste the phrase, and tap the speaker.'
+    );
+
+  } catch (error) {
+    notice(
+      'Copy unavailable. Select the French text and copy it manually.'
+    );
+  }
+}
+
 function savePractice(i,v){state.practiceText[i]=v;save()}
 const LEVELS=['A1','A2','B1','B2'];
 const PLACEMENT=[
