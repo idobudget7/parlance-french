@@ -19,3 +19,6 @@ Without a configured backend the app remains usable in guest mode, but **cloud s
 ## PWA
 
 The mobile layout uses a fixed bottom navigation, safe-area support, full-height app shell and installable web manifest. For installation open the deployed URL and use the browser's Add to Home Screen / Install App action. Test PWA installation and touch interactions on representative iOS and Android devices.
+
+## V4 pronunciation update
+Practice missions now show a sample French answer and a Google Translate pronunciation link for that exact sample. Device voice controls and the Play my response control have been removed. Google Translate opens externally and the user taps its speaker; automatic playback is not available.
